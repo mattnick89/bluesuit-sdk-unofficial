@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { readFile } from "fs";
 import fetch from 'node-fetch';
-import * as FileApi from 'file-api';
 function isUrl(string) {
     var protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
     var localhostDomainRE = /^localhost[\:?\d]*(?:[^\:?\d]\S*)?$/;
@@ -35,18 +34,10 @@ class Documents {
     readFileLocal(document_path) {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
             readFile(document_path, (err, data) => {
-                let f = new FileApi.File({
-                    buffer: data,
-                    name: "test.pdf",
-                    type: "application/pdf",
-                    length: data.length,
-                    jsdom: true
-                });
-                console.log(f);
                 if (err) {
                     throw new Error("Unable to access local document");
                 }
-                return resolve(f);
+                return resolve(data);
             });
         }));
     }
@@ -54,15 +45,7 @@ class Documents {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
             fetch(document_path).then((response) => __awaiter(this, void 0, void 0, function* () {
                 const body = yield response.arrayBuffer();
-                let file = new FileApi.File({
-                    buffer: Buffer.from(body),
-                    name: "test.pdf",
-                    type: "application/pdf",
-                    lastModifiedDate: new Date().toISOString(),
-                    size: Buffer.from(body).length
-                });
-                console.log(file);
-                return resolve(file);
+                return resolve(Buffer.from(body));
             }))
                 .catch((err) => {
                 throw new Error("Unable to access remote document");

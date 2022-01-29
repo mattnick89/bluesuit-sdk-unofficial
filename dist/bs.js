@@ -13,15 +13,13 @@ import DocumentsService from "./services/documents.service.js";
 import axios from "axios";
 /**
  * @module BlueSuitSDK
- */
-/**
  * @class
  */
 export default class BlueSuitSDK {
     /**
-     * @constructor
-     * @param {string} apiKey
-     */
+    * @constructor
+    * @param {string} apiKey
+    */
     constructor(apiKey) {
         this._http = Http;
         if (apiKey.trim() == "") {
@@ -31,20 +29,20 @@ export default class BlueSuitSDK {
         this._config.setApiKey(apiKey);
     }
     /**
-     * @typedef ProcessFile
-     * @property {string} requestId
-     * @property {string} message
-     */
+    * @typedef ProcessFile
+    * @property {string} requestId
+    * @property {string} message
+    */
     /**
-     * @typedef ProcessOptions
-     * @property {string} tag
-     * @property {string[]} email
-     */
+    * @typedef ProcessOptions
+    * @property {string} tag
+    * @property {string[]} email
+    */
     /**
-     * @function
-     * @name processDocument
-     * @description Describes the document type and process type you would like use when submitting your document.
-     * @param { string | Buffer } document_path Pass a relative path to a file, a url to a hosted file, or a binary stream of a file.
+    * @function
+    * @name processDocument
+    * @description Describes the document type and process type you would like use when submitting your document.
+    * @param { string | Buffer } document_path Pass a file path, a url to a hosted file, or a binary stream of a file.
     * @param {('closing_disclosure'|'property_deed'|'rent_roll'|'purchase_sale_agreement'|'offering_memo')} document_type
     * @param {('accurate'|'quick'|'foundational')} processing_type
     * @param {ProcessOptions} options
@@ -53,7 +51,7 @@ export default class BlueSuitSDK {
     processDocument(document_path, document_type, processing_type, options = {}) {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
             if (document_type != "psa" && processing_type == "foundational") {
-                throw new Error("Foundational processing is only available for Purchase and Sale Agreement documents");
+                throw new Error("Foundational processing is only available for Purchase and Sale Agreement type documents.");
             }
             const document_buffer = yield DocumentsService.getDocumentBuffer(document_path);
             let query_string = "";
@@ -72,8 +70,12 @@ export default class BlueSuitSDK {
             }
             axios({
                 method: "post",
-                url: this._config.getApiBasePath() + document_path + "/" + processing_type + query_string,
-                data: document_buffer
+                url: this._config.getApiBasePath() + document_type + "/" + processing_type + query_string,
+                data: document_buffer,
+                headers: {
+                    "Content-Type": "application/pdf",
+                    "x-api-key": this._config.getApiKey()
+                }
             }).then((res) => {
                 let response = {
                     message: res.data.message,
@@ -105,6 +107,9 @@ export default class BlueSuitSDK {
             axios({
                 method: "get",
                 url: this._config.getApiBasePath() + "status?requestId=" + requestId,
+                headers: {
+                    "x-api-key": this._config.getApiKey()
+                }
             }).then((res) => {
                 let response = {
                     message: res.data.message,

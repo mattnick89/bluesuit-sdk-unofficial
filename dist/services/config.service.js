@@ -1,8 +1,7 @@
 class ConfigService {
     constructor() {
         this.apiKey = "";
-        //private apiBasePath: string = "https://extract.bluesuit.com/v1/";
-        this.apiBasePath = "http://localhost:3000/";
+        this.apiBasePath = "https://extract.bluesuit.com/v1/";
     }
     setApiKey(apiKey) {
         this.apiKey = apiKey;
